@@ -72,4 +72,18 @@ public class TransactionsController {
         return ResponseEntity.status(HttpStatus.OK).body(transactionService.save(transactionsModel));
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Object> upDatePatchTransaction(@PathVariable(value = "id") UUID id,
+                                                    @RequestBody TransactionDto transactionDto) {
+        Optional<TransactionsModel> transactionsModelOptional = transactionService.findById(id);
+        if (!transactionsModelOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("O usuário informado não existe");
+        }
+        var transactionsModel = transactionsModelOptional.get();
+        transactionsModel.setValue(transactionDto.getValue());
+        transactionsModel.setDescription(transactionDto.getDescription());
+        transactionsModel.setTransactionType(transactionDto.getTransactionType());
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.save(transactionsModel));
+    }
+
 }
