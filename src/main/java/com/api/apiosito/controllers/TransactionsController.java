@@ -36,14 +36,14 @@ public class TransactionsController {
 
     @GetMapping
     public ResponseEntity<List<TransactionsModel>> getAllTransactions(){
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(transactionService.findAll());
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getOneTransaction(@PathVariable(value = "id")UUID id){
         Optional<TransactionsModel> transactionsModelOptional = transactionService.findById(id);
         if (!transactionsModelOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não existe o usuario");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("O usuário informado não existe");
         }
         return ResponseEntity.status(HttpStatus.OK).body(transactionsModelOptional.get());
     }
@@ -52,12 +52,24 @@ public class TransactionsController {
     public ResponseEntity<Object> deleteTransaction(@PathVariable(value = "id")UUID id) {
         Optional<TransactionsModel> transactionsModelOptional = transactionService.findById(id);
         if (!transactionsModelOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não existe o usuario");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("O usuário informado não existe");
         }
         transactionService.delete(transactionsModelOptional.get());
         return ResponseEntity.status(HttpStatus.OK).body("Transação deletada com sucesso");
     }
 
-
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> upDateTransaction(@PathVariable(value = "id") UUID id,
+                                                    @RequestBody TransactionDto transactionDto) {
+        Optional<TransactionsModel> transactionsModelOptional = transactionService.findById(id);
+        if (!transactionsModelOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("O usuário informado não existe");
+        }
+        var transactionsModel = transactionsModelOptional.get();
+        transactionsModel.setValue(transactionDto.getValue());
+        transactionsModel.setDescription(transactionDto.getDescription());
+        transactionsModel.setTransactionType(transactionDto.getTransactionType());
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.save(transactionsModel));
+    }
 
 }
